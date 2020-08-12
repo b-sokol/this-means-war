@@ -1,3 +1,45 @@
-#deploy, #redeploy {
-    display: none;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    display: grid;
+    grid-template-rows: 10% 25% 30% 25% 10%;
+    grid-template-areas:
+        "title"
+        "player-one"
+        "battleground"
+        "player-two"
+        "controls";
+}
+
+h1 {
+    grid-area: title;
+    text-align: center;
+}
+
+.player-one {
+    grid-area: player-one;
+}
+
+.player-two {
+    grid-area: player-two;
+}
+
+.battleground {
+    grid-area: battleground;
+}
+
+button {
+    grid-area: controls;
+}
+
+.player-deck {
+    display: inline;
+    position: absolute;
+    margin-left: 10px;
+    padding-left: 5px;
 }

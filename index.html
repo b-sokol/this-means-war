@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,27 @@
     <link rel="stylesheet" href="css/card-deck-css/css/cardstarter.css">
     <script defer src="js/main.js"></script>
 </head>
+
 <body>
-    <main>
         <h1 id="title">This Means War!</h1>
-        <table>
-            <tr id="player-one">
+            <div id="player-one">
                 <input type="text" id="player-one-name" placeholder="Player One">
-                <div id="player-one-deck"></div>
-            </tr>
-            <tr id="battleground">
+                <input type="submit" id="player-one-name-submit" value="submit">
+                <section id="player-one-deck" class="player-deck"></section>
+            </div>
+            <div id="battleground">
                 <h3>Battle Ground</h3>
-                <div id="battleground-deck"></div>
-                <div id="spoils"></div>
-            </tr>
-            <tr id="player-two">
+                <section id="battleground-deck"></section>
+                <section id="spoils"></section>
+            </div>
+            <div id="player-two">
                 <input type="text" id="player-two-name" placeholder="Player Two">
-                <div id="player-two-deck"></div>
-            </tr>
-        </table>
+                <input type="submit" id="player-two-name-submit" value="submit">
+                <section id="player-two-deck" class="player-deck"></section>
+            </div>
         <button id="play">Enter Battle</button>
         <button id="deploy">Deploy Soldier</button>
         <button id="redeploy">Redploy Troops</button>
-    </main>
 </body>
+
 </html>
