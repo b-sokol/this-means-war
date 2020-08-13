@@ -38,14 +38,19 @@ let pTwoCard;
 let shuffledDeck = [];
 let deckOne = [];
 let deckTwo = [];
+let playerOneWarPile = [];
+let playerTwoWarPile = [];
 let spoils = [];
 
 /*----- cached element references -----*/
 
 const deckOneEl = document.getElementById('player-one-deck');
 const deckTwoEl = document.getElementById('player-two-deck');
-const battlegroundDeckEl = document.getElementById('battleground-deck');
+const battlegroundEl = document.getElementById('battleground');
 const battlegroundTextEl = document.getElementById('battleground-text');
+const battlegroundDeckEl = document.getElementById('battleground-deck');
+const playerOneSoldierEl = document.getElementById('player-one-soldier');
+const playerTwoSoldierEl = document.getElementById('player-two-soldier');
 const spoilsEl = document.getElementById('spoils');
 const deployEl = document.getElementById('deploy');
 const redeployEl = document.getElementById('redeploy');
@@ -85,7 +90,6 @@ function buildMasterDeck() {
     ranks.forEach((rank) => {
       deck.push({
         face: `${suit}${rank}`,
-        back: 'back',
       });
     });
   });
@@ -139,6 +143,7 @@ function deal(dShuffled, dOne, dTwo) {
 function toTheVictorGoTheSpoils(victor) {
   spoils.forEach((card) => victor.deck.splice(0, 0, card));
   spoils.splice(0);
+  renderSpoils(victor.deckEl);
 }
 
 function getWinner() {
@@ -154,14 +159,11 @@ function getWinner() {
 function getHandResults(cardOne, cardTwo) {
   spoils.push(cardOne, cardTwo);
   if (isWar(cardOne, cardTwo)) {
-    renderWar();
-  }
-  if (getCardValue(cardOne) > getCardValue(cardTwo)) {
+    war();
+  } else if (getCardValue(cardOne) > getCardValue(cardTwo)) {
     toTheVictorGoTheSpoils(players[1]);
-    console.log(players[1].deck, players[-1].deck);
   } else if (getCardValue(cardOne) < getCardValue(cardTwo)) {
     toTheVictorGoTheSpoils(players[-1]);
-    console.log(players[1].deck, players[-1].deck);
   }
 }
 
@@ -186,8 +188,8 @@ function renderDeckInContainer(deck, container) {
       `<div class="card ${
         card.face
       }" style="z-index: ${index}; position: absolute; left: ${
-        index * 20 + 'px'
-      }"></div>`
+        index * 20
+      }px"></div>`
     );
   }, '');
   container.innerHTML = cardsHtml;
@@ -195,19 +197,11 @@ function renderDeckInContainer(deck, container) {
 
 function renderDeckDown(player, container) {
   let deck = players[player].deck;
-  let pName = players[player].name + ' ';
   for (let i = 0; i < deck.length; i++) {
     container.innerHTML = '';
     const cardsBackHtml = deck.reduce((html, card) => {
       let index = deck.indexOf(card);
-      return (
-        html +
-        `<div class="card ${card.back}" id="${
-          pName + ' ' + index
-        }" style="z-index: ${index}; position: absolute; left: ${
-          index + 'px'
-        }"></div>`
-      );
+      return html + `<div class="card back" id="${card.face}"></div>`;
     }, '');
     container.innerHTML = cardsBackHtml;
   }
@@ -224,62 +218,123 @@ function renderPlay() {
   playEl.style.display = 'none';
   deployEl.style.display = 'block';
   renderDeckDown('1', deckOneEl);
+  renderDeck(deckOneEl);
   renderDeckDown('-1', deckTwoEl);
+  renderDeck(deckTwoEl);
 }
 
 function isWar(playerOneCard, playerTwoCard) {
   return getCardValue(playerOneCard) === getCardValue(playerTwoCard);
 }
 
-function renderWar() {
-  let playerOneWarPile = [];
-  let playerTwoWarPile = [];
-  let playerOneFaceUp = null;
-  let playerTwoFaceUp = null;
+/*
+Something is wrong here, 
+adds first up card and second 
+down card to winner only, 
+leaves 1st and 3rd down card 
+and final up card on battleground
+*/
+function renderWar(numDownCards) {
+  battlegroundTextEl.innerText = 'WAR!';
+  setTimeout(() => {
+    for (let c = 0; c <= numDownCards; c++) {
+      playerOneSoldierEl.appendChild(deckOneEl.lastChild);
+      playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
+      playerOneSoldierEl.children[c].setAttribute(
+        'style',
+        `z-index: ${c}; left: ${c * 20 + 100}px`
+      );
+      playerTwoSoldierEl.children[c].setAttribute(
+        'style',
+        `z-index: ${c}; left: ${c * 20 + 100}px`
+      );
+    }
+  }, 2500);
+  setTimeout(() => {
+    playerOneSoldierEl.appendChild(deckOneEl.lastChild);
+    playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
+    playerOneSoldierEl.lastChild.setAttribute(
+      'style',
+      `z-index: ${numDownCards + 1}; left: ${(numDownCards + 1) * 20 + 100}px`
+    );
+    playerOneSoldierEl.lastChild.setAttribute(
+      'class',
+      `card ${playerOneSoldierEl.lastChild.id}`
+    );
+    playerTwoSoldierEl.lastChild.setAttribute(
+      'style',
+      `z-index: ${numDownCards + 1}; left: ${(numDownCards + 1) * 20 + 100}px`
+    );
+    playerTwoSoldierEl.lastChild.setAttribute(
+      'class',
+      `card ${playerTwoSoldierEl.lastChild.id}`
+    );
+  }, 2500);
+}
+
+function dealWar(numCardsDown) {
+  playerOneWarPile = players[1].deck.splice(numCardsDown);
+  playerTwoWarPile = players[-1].deck.splice(numCardsDown);
+  playerOneWarPile.forEach((card) => spoils.push(card));
+  playerOneWarPile.splice(0);
+  playerTwoWarPile.forEach((card) => spoils.push(card));
+  playerTwoWarPile.splice(0);
+}
+
+function war() {
   if (players[1].deck.length > 3 && players[-1].deck.length > 3) {
-    playerOneWarPile = players[1].deck.splice(-3);
-    playerTwoWarPile = players[-1].deck.splice(-3);
-    playerOneFaceUp = players[1].deck.pop();
-    playerTwoFaceUp = players[-1].deck.pop();
-    playerOneWarPile.forEach((card) => spoils.push(card));
-    playerOneWarPile.splice(0);
-    playerTwoWarPile.forEach((card) => spoils.push(card));
-    playerTwoWarPile.splice(0);
-    if (isWar(playerOneFaceUp, playerTwoFaceUp)) {
-      renderWar();
-    } else getHandResults(playerOneFaceUp, playerTwoFaceUp);
-  } else if (players[1].deck.length < 3) {
-    playerOneWarPile = players[1].deck.splice(
-      (players[1].deck.length - 1) * -1
-    );
-    playerTwoWarPile = players[-1].deck.splice(
-      (players[1].deck.length - 1) * -1
-    );
-    playerOneFaceUp = players[1].deck.pop();
-    playerTwoFaceUp = players[-1].deck.pop();
-    playerOneWarPile.forEach((card) => spoils.push(card));
-    playerOneWarPile.splice(0);
-    playerTwoWarPile.forEach((card) => spoils.push(card));
-    playerTwoWarPile.splice(0);
-  } else {
-    playerOneWarPile = players[1].deck.splice(
-      (players[-1].deck.length - 1) * -1
-    );
-    playerTwoWarPile = players[-1].deck.splice(
-      (players[-1].deck.length - 1) * -1
-    );
-    playerOneFaceUp = players[1].deck.pop();
-    playerTwoFaceUp = players[-1].deck.pop();
-    playerOneWarPile.forEach((card) => spoils.push(card));
-    playerOneWarPile.splice(0);
-    playerTwoWarPile.forEach((card) => spoils.push(card));
-    playerTwoWarPile.splice(0);
+    dealWar(3);
+    setTimeout(playCard, 2500);
+    renderWar(3);
+  } else if (players[1].deck.length < 4) {
+    dealWar(players[1].deck.length - 1);
+    setTimeout(playCard, 2500);
+    renderWar(players[1].deck.length - 1);
+  } else if (players[-1].deck.length < 4) {
+    dealWar(players[-1].deck.length - 1);
+    setTimeout(playCard, 2500);
+    renderWar(players[-1].deck.length - 1);
   }
+}
+
+function renderPlayCard() {
+  playerOneSoldierEl.appendChild(deckOneEl.lastChild);
+  playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
+  playerOneSoldierEl.innerHTML = `<div class="card ${playerOneSoldierEl.lastChild.id}" id="${playerOneSoldierEl.lastChild.id}"></div>`;
+  playerTwoSoldierEl.innerHTML = `<div class="card ${playerTwoSoldierEl.lastChild.id}" id="${playerTwoSoldierEl.lastChild.id}"></div>`;
+}
+
+function renderDeck(deckEl) {
+  for (let s = 0; s < deckEl.childElementCount; s++) {
+    deckEl.children[s].setAttribute(
+      'style',
+      `z-index: ${s}; position: absolute; left: ${s}px`
+    );
+  }
+}
+
+function renderSpoils(winningDeckEl) {
+  setTimeout(() => {
+    for (let s = 0; s < playerOneSoldierEl.childElementCount; s++) {
+      playerOneSoldierEl.children[s].setAttribute('class', 'card back');
+      winningDeckEl.insertBefore(
+        playerOneSoldierEl.children[s],
+        winningDeckEl.firstChild
+      );
+      playerTwoSoldierEl.children[s].setAttribute('class', 'card back');
+      winningDeckEl.insertBefore(
+        playerTwoSoldierEl.children[s],
+        winningDeckEl.firstChild
+      );
+    }
+    renderDeck(winningDeckEl);
+  }, 1000);
 }
 
 function playCard() {
   pOneCard = players[1].deck.pop();
   pTwoCard = players[-1].deck.pop();
+  renderPlayCard();
   getHandResults(pOneCard, pTwoCard);
   if (getWinner() === players[1]) {
     renderGameWon(players[1], players[-1]);

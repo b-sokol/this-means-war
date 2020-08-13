@@ -6,27 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>This Means War!</title>
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/card-deck-css/css/cardstarter.css">
+    <link rel="stylesheet" href="css/cardstarter.css">
     <script defer src="js/main.js"></script>
 </head>
 
 <body>
     <h1 id="title">This Means War!</h1>
-    <div id="player-one">
+    <section id="player-one">
         <input type="text" id="player-one-name" placeholder="Player One">
         <input type="submit" id="player-one-name-submit" value="submit">
-        <section id="player-one-deck" class="player-deck"></section>
-    </div>
-    <div id="battleground">
+        <div id="player-one-deck" class="player-deck"></div>
+    </section>
+    <section id="battleground">
         <h1 id="battleground-text"></h1>
-        <section id="battleground-deck"></section>
-        <section id="spoils"></section>
-    </div>
-    <div id="player-two">
+        <div id="battleground-deck"></div>
+        <div id="player-one-soldier"></div>
+        <div id="player-two-soldier"></div>
+        <div id="spoils"></div>
+    </section>
+    <section id="player-two">
         <input type="text" id="player-two-name" placeholder="Player Two">
         <input type="submit" id="player-two-name-submit" value="submit">
-        <section id="player-two-deck" class="player-deck"></section>
-    </div>
+        <div id="player-two-deck" class="player-deck"></div>
+    </section>
     <button id="play">Enter Battle</button>
     <button id="deploy">Deploy Soldier</button>
     <button id="redeploy">Redploy Troops</button>

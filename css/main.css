@@ -1,3 +1,8 @@
+/* FOR DEMOING-DELETE BEFORE LAUNCH!!!! */
+input {
+    display: none;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -29,12 +34,42 @@ h1 {
     grid-area: player-two;
 }
 
+.battleground-deck {
+    display: flex;
+    justify-content: center;
+}
+
 .battleground {
     grid-area: battleground;
+    display: grid;
+    grid-template-rows: 33% 34% 33%;
+    grid-template-areas:
+        "one"
+        "spoils"
+        "two";
+}
+
+.player-one-soldier:last-child {
+    position: relative;
+    top: 0;
+    grid-area: one;
+}
+
+.player-two-soldier:last-child {
+    position: relative;
+    bottom: 0;
+    grid-area: two;
+}
+
+.spoils:last-child {
+    position: relative;
+    grid-area: spoils;
 }
 
 button {
     grid-area: controls;
+    width: 10%;
+    margin: auto;
 }
 
 .player-deck {
