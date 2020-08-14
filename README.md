@@ -17,9 +17,7 @@
 
 ## Wireframe
 
-![alt text][wirefram› 1]
-
-[wireframe 1]: https://raw.githubusercontent.com/b-sokol/this-means-war/master/images/wireframe/wireframe-1.JPG "Wireframe 1"
+![Wireframe 1](./images/wireframe/wireframe-1.JPG)
 
 ## Screen Shots
 
