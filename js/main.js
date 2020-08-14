@@ -186,13 +186,13 @@ function war() {
     if (players[1].deck.length > 3 && players[-1].deck.length > 3) {
       renderWar();
       dealWar();
-    } else if (players[1].deck.length < 4) {
+    } else if (players[1].deck.length < players[-1].deck.length) {
       renderGameWon(
         `${players[1].name} does not have enough troops for battle. ${
           players[-1].name
         } has won the war.`
       );
-    } else if (players[-1].deck.length < 4) {
+    } else {
       renderGameWon(
         `${players[1].name} does not have enough troops for battle. ${
           players[-1].name
@@ -298,21 +298,21 @@ function renderWar() {
   for (let c = 0; c < 3; c++) {
     playerOneSoldierEl.appendChild(deckOneEl.lastChild);
     playerOneSoldierEl.children[c].style.zIndex = c;
-    playerOneSoldierEl.children[c].style.left = c * 20 + 100 + 'px';
+    playerOneSoldierEl.children[c].style.left = c** + 50 + 'px';
     playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
     playerTwoSoldierEl.children[c].style.zIndex = c;
-    playerTwoSoldierEl.children[c].style.left = c * 20 + 100 + 'px';
+    playerTwoSoldierEl.children[c].style.left = c** + 50 + 'px';
   }
   playerOneSoldierEl.appendChild(deckOneEl.lastChild);
   playerOneSoldierEl.lastChild.style.zIndex = 4;
-  playerOneSoldierEl.lastChild.style.left = '180px';
+  playerOneSoldierEl.lastChild.style.left = '66px';
   playerOneSoldierEl.lastChild.setAttribute(
     'class',
     `card ${playerOneSoldierEl.lastChild.id}`
   );
   playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
   playerTwoSoldierEl.lastChild.style.zIndex = 4;
-  playerTwoSoldierEl.lastChild.style.left = '180px';
+  playerTwoSoldierEl.lastChild.style.left = '66px';
   playerTwoSoldierEl.lastChild.setAttribute(
     'class',
     `card ${playerTwoSoldierEl.lastChild.id}`
