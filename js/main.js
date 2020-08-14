@@ -17,7 +17,6 @@ const ranks = [
   'K',
 ];
 const masterDeck = buildMasterDeck();
-
 const players = {
   '1': {
     name: 'Player One',
@@ -36,8 +35,6 @@ const players = {
 let pOneCard;
 let pTwoCard;
 let shuffledDeck = [];
-let deckOne = [];
-let deckTwo = [];
 let playerOneWarPile = [];
 let playerTwoWarPile = [];
 let spoils = [];
@@ -104,6 +101,10 @@ function shuffleDeck(deck, newDeck) {
   }
 }
 
+function clearMsg() {
+  battlegroundTextEl.innerText = '';
+}
+
 function getCardValue(c) {
   let cardFace = c.face;
   let cardValue;
@@ -140,19 +141,27 @@ function deal(dShuffled, dOne, dTwo) {
   }
 }
 
-function toTheVictorGoTheSpoils(victor) {
-  spoils.forEach((card) => victor.deck.splice(0, 0, card));
-  spoils.splice(0);
-  renderSpoils(victor.deckEl);
-}
-
-function getWinner() {
-  if (players[1].deck.length === 0 && players[-1].deck.length === 0) {
-    return 'tie';
-  } else if (players[1].deck.length === 52) {
-    return players[1];
-  } else if (players[-1].deck.length === 52) {
-    return players[-1];
+function playCard() {
+  deployEl.style.display = 'none';
+  pOneCard = players[1].deck.pop();
+  pTwoCard = players[-1].deck.pop();
+  clearMsg();
+  renderPlayCards(pOneCard, pTwoCard);
+  getHandResults(pOneCard, pTwoCard);
+  if (getWinner() === players[1]) {
+    renderGameWon(
+      `All of ${players[-1].name}'s troops have fallen. ${
+        players[1].name
+      } has won the war!`
+    );
+  } else if (getWinner() === players[-1]) {
+    renderGameWon(
+      `All of ${players[1].name}'s troops have fallen. ${
+        players[-1].name
+      } has won the war!`
+    );
+  } else if (getWinner() === 'tie') {
+    renderGameTie();
   }
 }
 
@@ -167,16 +176,65 @@ function getHandResults(cardOne, cardTwo) {
   }
 }
 
-function renderGameWon(winner, loser) {
-  deployEl.style.display = 'none';
-  redeployEl.style.display = 'block';
-  battlegroundTextEl.innerText = `All of ${loser.name}'s troops have fallen. ${winner.name} has won the war!`;
+function isWar(playerOneCard, playerTwoCard) {
+  return getCardValue(playerOneCard) === getCardValue(playerTwoCard);
 }
 
-function renderGameTie() {
-  deployEl.style.display = 'none';
-  redeployEl.style.display = 'block';
-  battlegroundTextEl.innerText = `All of troops have fallen. In war, nobody wins!`;
+function war() {
+  battlegroundTextEl.innerText = 'WAR!';
+  setTimeout(() => {
+    if (players[1].deck.length > 3 && players[-1].deck.length > 3) {
+      renderWar();
+      dealWar();
+    } else if (players[1].deck.length < 4) {
+      renderGameWon(
+        `${players[1].name} does not have enough troops for battle. ${
+          players[-1].name
+        } has won the war.`
+      );
+    } else if (players[-1].deck.length < 4) {
+      renderGameWon(
+        `${players[1].name} does not have enough troops for battle. ${
+          players[-1].name
+        } has won the war.`
+      );
+    }
+  }, 2000);
+}
+
+function dealWar() {
+  playerOneWarPile = players[1].deck.splice(-3);
+  playerTwoWarPile = players[-1].deck.splice(-3);
+  playerOneWarPile.forEach((card) => spoils.push(card));
+  playerOneWarPile.splice(0);
+  playerTwoWarPile.forEach((card) => spoils.push(card));
+  playerTwoWarPile.splice(0);
+  getHandResults(players[1].deck.pop(), players[-1].deck.pop());
+  if (getWinner() === players[1]) {
+    renderGameWon(players[1], players[-1]);
+  } else if (getWinner() === players[-1]) {
+    renderGameWon(players[-1], players[1]);
+  } else if (getWinner() === 'tie') {
+    renderGameTie();
+  }
+}
+
+function toTheVictorGoTheSpoils(victor) {
+  spoils.forEach((card) => victor.deck.splice(0, 0, card));
+  spoils.splice(0);
+  setTimeout(() => {
+    renderSpoils(victor.deckEl);
+  }, 2000);
+}
+
+function getWinner() {
+  if (players[1].deck.length === 0 && players[-1].deck.length === 0) {
+    return 'tie';
+  } else if (players[1].deck.length === 52) {
+    return players[1];
+  } else if (players[-1].deck.length === 52) {
+    return players[-1];
+  }
 }
 
 function renderDeckInContainer(deck, container) {
@@ -189,7 +247,7 @@ function renderDeckInContainer(deck, container) {
         card.face
       }" style="z-index: ${index}; position: absolute; left: ${
         index * 20
-      }px"></div>`
+      }px;"></div>`
     );
   }, '');
   container.innerHTML = cardsHtml;
@@ -207,14 +265,20 @@ function renderDeckDown(player, container) {
   }
 }
 
+function renderDeck(deckEl) {
+  for (let s = 0; s < deckEl.childElementCount; s++) {
+    deckEl.children[s].style.zIndex = s;
+    deckEl.children[s].style.position = 'absolute';
+    deckEl.children[s].style.left = s + 'px';
+  }
+}
+
 function renderPlay() {
   battlegroundDeckEl.innerHTML = '';
-  players[1].deck = deckOne;
   players[1].deckEl = deckOneEl;
-  players[-1].deck = deckTwo;
   players[-1].deckEl = deckTwoEl;
   shuffleDeck(masterDeck, shuffledDeck);
-  deal(shuffledDeck, deckOne, deckTwo);
+  deal(shuffledDeck, players[1].deck, players[-1].deck);
   playEl.style.display = 'none';
   deployEl.style.display = 'block';
   renderDeckDown('1', deckOneEl);
@@ -223,126 +287,62 @@ function renderPlay() {
   renderDeck(deckTwoEl);
 }
 
-function isWar(playerOneCard, playerTwoCard) {
-  return getCardValue(playerOneCard) === getCardValue(playerTwoCard);
-}
-
-/*
-Something is wrong here, 
-adds first up card and second 
-down card to winner only, 
-leaves 1st and 3rd down card 
-and final up card on battleground
-*/
-function renderWar(numDownCards) {
-  battlegroundTextEl.innerText = 'WAR!';
-  setTimeout(() => {
-    for (let c = 0; c <= numDownCards; c++) {
-      playerOneSoldierEl.appendChild(deckOneEl.lastChild);
-      playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
-      playerOneSoldierEl.children[c].setAttribute(
-        'style',
-        `z-index: ${c}; left: ${c * 20 + 100}px`
-      );
-      playerTwoSoldierEl.children[c].setAttribute(
-        'style',
-        `z-index: ${c}; left: ${c * 20 + 100}px`
-      );
-    }
-  }, 2500);
-  setTimeout(() => {
-    playerOneSoldierEl.appendChild(deckOneEl.lastChild);
-    playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
-    playerOneSoldierEl.lastChild.setAttribute(
-      'style',
-      `z-index: ${numDownCards + 1}; left: ${(numDownCards + 1) * 20 + 100}px`
-    );
-    playerOneSoldierEl.lastChild.setAttribute(
-      'class',
-      `card ${playerOneSoldierEl.lastChild.id}`
-    );
-    playerTwoSoldierEl.lastChild.setAttribute(
-      'style',
-      `z-index: ${numDownCards + 1}; left: ${(numDownCards + 1) * 20 + 100}px`
-    );
-    playerTwoSoldierEl.lastChild.setAttribute(
-      'class',
-      `card ${playerTwoSoldierEl.lastChild.id}`
-    );
-  }, 2500);
-}
-
-function dealWar(numCardsDown) {
-  playerOneWarPile = players[1].deck.splice(numCardsDown);
-  playerTwoWarPile = players[-1].deck.splice(numCardsDown);
-  playerOneWarPile.forEach((card) => spoils.push(card));
-  playerOneWarPile.splice(0);
-  playerTwoWarPile.forEach((card) => spoils.push(card));
-  playerTwoWarPile.splice(0);
-}
-
-function war() {
-  if (players[1].deck.length > 3 && players[-1].deck.length > 3) {
-    dealWar(3);
-    setTimeout(playCard, 2500);
-    renderWar(3);
-  } else if (players[1].deck.length < 4) {
-    dealWar(players[1].deck.length - 1);
-    setTimeout(playCard, 2500);
-    renderWar(players[1].deck.length - 1);
-  } else if (players[-1].deck.length < 4) {
-    dealWar(players[-1].deck.length - 1);
-    setTimeout(playCard, 2500);
-    renderWar(players[-1].deck.length - 1);
-  }
-}
-
-function renderPlayCard() {
+function renderPlayCards(cOne, cTwo) {
   playerOneSoldierEl.appendChild(deckOneEl.lastChild);
   playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
-  playerOneSoldierEl.innerHTML = `<div class="card ${playerOneSoldierEl.lastChild.id}" id="${playerOneSoldierEl.lastChild.id}"></div>`;
-  playerTwoSoldierEl.innerHTML = `<div class="card ${playerTwoSoldierEl.lastChild.id}" id="${playerTwoSoldierEl.lastChild.id}"></div>`;
+  playerOneSoldierEl.innerHTML = `<div class="card ${cOne.face}" id="${playerOneSoldierEl.lastChild.id}"></div>`;
+  playerTwoSoldierEl.innerHTML = `<div class="card ${cTwo.face}" id="${playerTwoSoldierEl.lastChild.id}"></div>`;
 }
 
-function renderDeck(deckEl) {
-  for (let s = 0; s < deckEl.childElementCount; s++) {
-    deckEl.children[s].setAttribute(
-      'style',
-      `z-index: ${s}; position: absolute; left: ${s}px`
-    );
+function renderWar() {
+  for (let c = 0; c < 3; c++) {
+    playerOneSoldierEl.appendChild(deckOneEl.lastChild);
+    playerOneSoldierEl.children[c].style.zIndex = c;
+    playerOneSoldierEl.children[c].style.left = c * 20 + 100 + 'px';
+    playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
+    playerTwoSoldierEl.children[c].style.zIndex = c;
+    playerTwoSoldierEl.children[c].style.left = c * 20 + 100 + 'px';
   }
+  playerOneSoldierEl.appendChild(deckOneEl.lastChild);
+  playerOneSoldierEl.lastChild.style.zIndex = 4;
+  playerOneSoldierEl.lastChild.style.left = '180px';
+  playerOneSoldierEl.lastChild.setAttribute(
+    'class',
+    `card ${playerOneSoldierEl.lastChild.id}`
+  );
+  playerTwoSoldierEl.appendChild(deckTwoEl.lastChild);
+  playerTwoSoldierEl.lastChild.style.zIndex = 4;
+  playerTwoSoldierEl.lastChild.style.left = '180px';
+  playerTwoSoldierEl.lastChild.setAttribute(
+    'class',
+    `card ${playerTwoSoldierEl.lastChild.id}`
+  );
 }
 
 function renderSpoils(winningDeckEl) {
-  setTimeout(() => {
-    for (let s = 0; s < playerOneSoldierEl.childElementCount; s++) {
-      playerOneSoldierEl.children[s].setAttribute('class', 'card back');
-      winningDeckEl.insertBefore(
-        playerOneSoldierEl.children[s],
-        winningDeckEl.firstChild
-      );
-      playerTwoSoldierEl.children[s].setAttribute('class', 'card back');
-      winningDeckEl.insertBefore(
-        playerTwoSoldierEl.children[s],
-        winningDeckEl.firstChild
-      );
-    }
-    renderDeck(winningDeckEl);
-  }, 1000);
+  let sCount = playerOneSoldierEl.childElementCount;
+  for (let s = 0; s < sCount; s++) {
+    playerOneSoldierEl.lastChild.setAttribute('class', 'card back');
+    playerTwoSoldierEl.lastChild.setAttribute('class', 'card back');
+    winningDeckEl.prepend(
+      playerOneSoldierEl.lastChild,
+      playerTwoSoldierEl.lastChild
+    );
+  }
+  renderDeck(winningDeckEl);
+  deployEl.style.display = 'block';
 }
 
-function playCard() {
-  pOneCard = players[1].deck.pop();
-  pTwoCard = players[-1].deck.pop();
-  renderPlayCard();
-  getHandResults(pOneCard, pTwoCard);
-  if (getWinner() === players[1]) {
-    renderGameWon(players[1], players[-1]);
-  } else if (getWinner() === players[-1]) {
-    renderGameWon(players[-1], players[1]);
-  } else if (getWinner() === 'tie') {
-    renderGameTie();
-  }
+function renderGameTie() {
+  deployEl.style.display = 'none';
+  redeployEl.style.display = 'block';
+  battlegroundTextEl.innerText = `All of troops have fallen. In war, nobody wins!`;
+}
+
+function renderGameWon(msg) {
+  deployEl.style.display = 'none';
+  redeployEl.style.display = 'block';
+  battlegroundTextEl.innerText = msg;
 }
 
 initialize();
