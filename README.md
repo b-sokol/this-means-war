@@ -1,6 +1,6 @@
 # This Means War!
 
-### This is a children's game played in many parts of the world. No strategy is involved - simply the ability to recognise which of two cards is higher in rank, and to follow the procedure of the game. 
+### This is a children's game played in many parts of the world. No strategy is involved - simply the ability to recognize which of two cards is higher in rank, and to follow the procedure of the game. 
 
 ### In the basic game there are two players and you use a standard 52 card pack. Cards rank as usual from high to low: A K Q J T 9 8 7 6 5 4 3 2. Suits are ignored in this game.
 
@@ -19,14 +19,54 @@
 
 ![Wireframe 1](./images/wireframe/wireframe-1.JPG)
 
+![Wireframe 2](./images/wireframe/wireframe-2.JPG)
+
+![Wireframe 3](./images/wireframe/wireframe-3.JPG)
+
+![Wireframe 4](./images/wireframe/wireframe-4.JPG)
+
+![Wireframe 5](./images/wireframe/wireframe-5.JPG)
+
 ## Screen Shots
+
+![Screenshot 1](./images/screenshots/screen1.png)
+
+![Screenshot 2](./images/screenshots/screen2.png)
+
+![Screenshot 3](./images/screenshots/screen3.png)
+
+![Screenshot 4](./images/screenshots/screen4.png)
+
+![Screenshot 5](./images/screenshots/screen5.png)
 
 ## Technologies Used
 
-### * JavaScript
-### * HTML
-### * CSS
+ * JavaScript
+ * HTML
+ * CSS
 
 ## Getting Started
 
+[Link to game](https://b-sokol.github.io/this-means-war/)
+
+### Gameplay is pretty simple, just click the button to play the next card.
+
 ## Next Steps
+
+### I plan on implementing several icebox items, including, but not limited to:
+
+* Playing audio:
+    * on load
+    * on deal
+    * on play card
+    * on WAR!
+    * on game won
+    * on redeploy (play again)
+* Styling game like a battlefield 
+* properly align the WAR! spoils when dealt
+* Making design responsive
+* Incorporating a 4 player option
+* Add card animations 
+* Add an option to look at the WAR! spoils
+* Add an autoplay feature so you only have to press button once, and everything will be timed out
+* Add an option to make Aces low or high
