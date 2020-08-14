@@ -194,8 +194,8 @@ function war() {
       );
     } else {
       renderGameWon(
-        `${players[1].name} does not have enough troops for battle. ${
-          players[-1].name
+        `${players[-1].name} does not have enough troops for battle. ${
+          players[1].name
         } has won the war.`
       );
     }
